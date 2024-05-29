@@ -45,48 +45,99 @@
             font-size: 16px;
             text-align: center;
             max-width: 600px;
+            margin-bottom: 20px;
+        }
+        .result {
+            font-size: 18px;
+            font-weight: bold;
+            color: green;
+            margin-bottom: 20px;
+        }
+        .replay-button {
+            font-size: 16px;
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+        }
+        .replay-button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
     <div class="title">Jeu des cases blanches</div>
     <div class="grid">
-        <div class="cell black" data-x="0" data-y="0"></div>
-        <div class="cell white" data-x="0" data-y="1"></div>
-        <div class="cell black" data-x="0" data-y="2"></div>
-        <div class="cell white" data-x="1" data-y="0"></div>
-        <div class="cell black" data-x="1" data-y="1"></div>
-        <div class="cell white" data-x="1" data-y="2"></div>
-        <div class="cell black" data-x="2" data-y="0"></div>
-        <div class="cell white" data-x="2" data-y="1"></div>
-        <div class="cell black" data-x="2" data-y="2"></div>
+        <!-- La grille sera générée par JavaScript -->
     </div>
     <div class="objective">
         L'objectif est d'avoir une grille entièrement constituée de cases blanches. Chaque fois que l'on clique sur une case, celle-ci prend une couleur opposée ainsi que les cases adjacentes.
     </div>
+    <div class="result" id="result"></div>
+    <button class="replay-button" id="replayButton" style="display: none;">Rejouer</button>
     <script>
         const grid = document.querySelector('.grid');
-        const cells = grid.querySelectorAll('.cell');
+        const resultDiv = document.getElementById('result');
+        const replayButton = document.getElementById('replayButton');
+        let startTime;
 
-        cells.forEach(cell => {
-            cell.addEventListener('click', () => {
-                const x = parseInt(cell.getAttribute('data-x'));
-                const y = parseInt(cell.getAttribute('data-y'));
-                toggleColor(x, y);
-                toggleColor(x-1, y);
-                toggleColor(x+1, y);
-                toggleColor(x, y-1);
-                toggleColor(x, y+1);
-            });
-        });
+        function createGrid() {
+            grid.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell', Math.random() > 0.5 ? 'black' : 'white');
+                    cell.setAttribute('data-x', i);
+                    cell.setAttribute('data-y', j);
+                    cell.addEventListener('click', handleClick);
+                    grid.appendChild(cell);
+                }
+            }
+            startTime = Date.now();
+        }
 
         function toggleColor(x, y) {
             if (x >= 0 && x < 3 && y >= 0 && y < 3) {
                 const cell = document.querySelector(`.cell[data-x="${x}"][data-y="${y}"]`);
-                cell.classList.toggle('black');
-                cell.classList.toggle('white');
+                if (cell) {
+                    cell.classList.toggle('black');
+                    cell.classList.toggle('white');
+                }
             }
         }
+
+        function checkWin() {
+            const allWhite = [...document.querySelectorAll('.cell')].every(cell => cell.classList.contains('white'));
+            if (allWhite) {
+                const endTime = Date.now();
+                const elapsedSeconds = ((endTime - startTime) / 1000).toFixed(2);
+                resultDiv.textContent = `Tu as réussi en ${elapsedSeconds} secondes !`;
+                replayButton.style.display = 'block';
+                document.querySelectorAll('.cell').forEach(cell => cell.removeEventListener('click', handleClick));
+            }
+        }
+
+        function handleClick(event) {
+            const cell = event.target;
+            const x = parseInt(cell.getAttribute('data-x'));
+            const y = parseInt(cell.getAttribute('data-y'));
+            toggleColor(x, y);
+            toggleColor(x-1, y);
+            toggleColor(x+1, y);
+            toggleColor(x, y-1);
+            toggleColor(x, y+1);
+            checkWin();
+        }
+
+        replayButton.addEventListener('click', () => {
+            resultDiv.textContent = '';
+            replayButton.style.display = 'none';
+            createGrid();
+        });
+
+        createGrid();
     </script>
 </body>
 </html>
