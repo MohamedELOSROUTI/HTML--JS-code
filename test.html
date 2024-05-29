@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu des cases blanches</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 1px;
+            margin-bottom: 20px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border: 1px solid #000;
+        }
+        .black {
+            background-color: black;
+        }
+        .white {
+            background-color: white;
+        }
+        .objective {
+            font-size: 16px;
+            text-align: center;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div class="title">Jeu des cases blanches</div>
+    <div class="grid">
+        <div class="cell black" data-x="0" data-y="0"></div>
+        <div class="cell white" data-x="0" data-y="1"></div>
+        <div class="cell black" data-x="0" data-y="2"></div>
+        <div class="cell white" data-x="1" data-y="0"></div>
+        <div class="cell black" data-x="1" data-y="1"></div>
+        <div class="cell white" data-x="1" data-y="2"></div>
+        <div class="cell black" data-x="2" data-y="0"></div>
+        <div class="cell white" data-x="2" data-y="1"></div>
+        <div class="cell black" data-x="2" data-y="2"></div>
+    </div>
+    <div class="objective">
+        L'objectif est d'avoir une grille entièrement constituée de cases blanches. Chaque fois que l'on clique sur une case, celle-ci prend une couleur opposée ainsi que les cases adjacentes.
+    </div>
+    <script>
+        const grid = document.querySelector('.grid');
+        const cells = grid.querySelectorAll('.cell');
+
+        cells.forEach(cell => {
+            cell.addEventListener('click', () => {
+                const x = parseInt(cell.getAttribute('data-x'));
+                const y = parseInt(cell.getAttribute('data-y'));
+                toggleColor(x, y);
+                toggleColor(x-1, y);
+                toggleColor(x+1, y);
+                toggleColor(x, y-1);
+                toggleColor(x, y+1);
+            });
+        });
+
+        function toggleColor(x, y) {
+            if (x >= 0 && x < 3 && y >= 0 && y < 3) {
+                const cell = document.querySelector(`.cell[data-x="${x}"][data-y="${y}"]`);
+                cell.classList.toggle('black');
+                cell.classList.toggle('white');
+            }
+        }
+    </script>
+</body>
+</html>
